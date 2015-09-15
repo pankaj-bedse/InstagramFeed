@@ -20,6 +20,15 @@
 
 @implementation PhotosViewController
 
+
+//- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+//{
+//    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+//    if (self) {
+//        self.title = @"Instagram";
+//    }
+//    return self;
+//}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.rowHeight = 320;
@@ -60,7 +69,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.responseDictionary[@"data"] count];
+    return 1;
 }
 
 //- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -74,7 +83,7 @@
     
     MyTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.yahoo.table.cell" forIndexPath:indexPath];
     
-    NSString *url = self.responseDictionary[@"data"][indexPath.row][@"images"][@"low_resolution"][@"url"];
+    NSString *url = self.responseDictionary[@"data"][indexPath.section][@"images"][@"low_resolution"][@"url"];
     
     [cell.myImageView setImageWithURL:[NSURL URLWithString:url]];
     return cell;
@@ -93,7 +102,43 @@
     // Pass the selected object to the new view controller.
     PhotoDetailsViewController *photoDetailsViewController = [segue destinationViewController];
     NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
-    [photoDetailsViewController setData:self.responseDictionary[@"data"][indexPath.row][@"images"]];
+    [photoDetailsViewController setData:self.responseDictionary[@"data"][indexPath.section][@"images"]];
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [self.responseDictionary[@"data"] count];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView
+heightForHeaderInSection:(NSInteger)section
+{
+    return 50;
+}
+
+- (UIView *)tableView:(UITableView *)tableView
+viewForHeaderInSection:(NSInteger)section
+{
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+    [headerView setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.9]];
+    
+    UIImageView *profileView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 30, 30)];
+    [profileView setClipsToBounds:YES];
+    profileView.layer.cornerRadius = 15;
+    profileView.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.8].CGColor;
+    profileView.layer.borderWidth = 1;
+    
+    UITextView *userName = [[UITextView alloc]initWithFrame:CGRectMake(40, 10, 150, 30)];
+    userName.text = self.responseDictionary[@"data"][section][@"user"][@"username"];
+    NSString *url = self.responseDictionary[@"data"][section][@"user"][@"profile_picture"];
+    // Use the section number to get the right URL
+    [profileView setImageWithURL:[NSURL URLWithString:url]];
+    
+    
+    [headerView addSubview:profileView];
+    [headerView addSubview:userName];
+    // Add a UILabel for the username here
+    
+    return headerView;
+}
 @end
